@@ -21,9 +21,9 @@ class Board:
 
     def update_position(self):
         """ Update the position of the board. """
-        if self.moving_right:
+        if self.moving_right and self.rect.right < self.screen_rect.right:
             self.rect.x += self.settings.board_speed
-        elif self.moving_left:
+        elif self.moving_left and self.rect.left > self.screen_rect.left:
             self.rect.x -= self.settings.board_speed
 
     def blitme(self):
