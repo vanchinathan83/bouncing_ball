@@ -1,9 +1,11 @@
 import sys
 import pygame
+import pygame.sprite
 
 from settings import Settings
 from board import Board
 from ball import Ball
+from game_stats import GameStats
 
 
 class BouncingBall:
@@ -19,15 +21,23 @@ class BouncingBall:
         pygame.display.set_caption("Bouncing Ball")
 
         self.board = Board(self)
+        self.game_stats = GameStats(self)
         self.ball = Ball(self)
 
     def run_game(self):
         """ This is the main loop of the game. """
         while True:
             self._check_events()
-            self.board.update_position()
-            self.ball.update_position()
+            if self.game_stats.is_game_active:
+                self.board.update_position()
+                self._check_ball_bounce()
+                self.ball.update_position()
             self._update_screen()
+
+    def _check_ball_bounce(self):
+        """ Check whether the ball is bouncing off the board. """
+        if self.board.rect.colliderect(self.ball.rect):
+            self.ball.increment_y = False
 
     def _check_events(self):
         for event in pygame.event.get():

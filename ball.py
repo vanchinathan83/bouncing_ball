@@ -1,4 +1,5 @@
 import pygame
+import random
 
 class Ball:
     """ This is the class that controls the ball. """
@@ -12,26 +13,36 @@ class Ball:
         self.rect = self.image.get_rect()
 
         self.rect.center = self.screen_rect.center
-        self.moving_up = True
-        self.moving_down = True
-        self.within_bounds = self.rect.x <= self.settings.screen_width and self.rect.y <= self.settings.screen_height
+        self.game_stats = bb_game.game_stats
+        self.increment_x = True
+        self.increment_y = True
 
     def update_position(self):
         """ This method makes the ball move in a diagonal fashion. """
-        self.within_bounds = self.rect.x <= self.settings.screen_width and self.rect.y <= self.settings.screen_height 
-        if self.rect.x > 0 and self.rect.y > 0 and self.moving_up:
-            self.rect.x -= self.settings.ball_speed
-            self.rect.y -= self.settings.ball_speed
-        elif self.rect.x <= 0 or self.rect.y <=0 or (self.moving_down and self.within_bounds):
-            self.moving_up = False
-            self.moving_down = True
+        self._update_movement()
+
+        if self.increment_x:
             self.rect.x += self.settings.ball_speed
-            self.rect.y += self.settings.ball_speed
-        elif self.rect.x >= self.settings.screen_width or self.rect.y >= self.settings.screen_height:
-            self.moving_up = True
-            self.moving_down = False
+        else:
             self.rect.x -= self.settings.ball_speed
+
+        if self.increment_y:
+            self.rect.y += self.settings.ball_speed
+        else:
             self.rect.y -= self.settings.ball_speed
+
+    def _update_movement(self):
+        if self.rect.bottom >= self.screen_rect.bottom:
+            # Ball touched the bottom of the rectangle
+            # Decrement lives and center the ball
+            self.game_stats.decrement_lives()
+            self.rect.center = self.screen_rect.center
+        if self.rect.top <= self.screen_rect.top:
+            self.increment_y = True
+        if self.rect.right >= self.screen_rect.right:
+            self.increment_x = False
+        if self.rect.left <= self.screen_rect.left:
+            self.increment_x = True
 
     def blitme(self):
         """ Draw the board. """
