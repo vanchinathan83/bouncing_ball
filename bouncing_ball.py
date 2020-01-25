@@ -1,11 +1,13 @@
 import sys
 import pygame
 import pygame.sprite
+import random
 
 from settings import Settings
 from board import Board
 from ball import Ball
 from game_stats import GameStats
+from scoreboard import Scoreboard
 
 
 class BouncingBall:
@@ -22,7 +24,11 @@ class BouncingBall:
 
         self.board = Board(self)
         self.game_stats = GameStats(self)
-        self.ball = Ball(self)
+        self.scoreboard = Scoreboard(self)
+        self.balls = pygame.sprite.Group()
+        self.ball_choices = ["images/ball.png", "images/pink_ball.png", 
+                "images/yellow_ball.png"]
+        self.balls.add(Ball("images/ball.png", self))
 
     def run_game(self):
         """ This is the main loop of the game. """
@@ -31,19 +37,26 @@ class BouncingBall:
             if self.game_stats.is_game_active:
                 self.board.update_position()
                 self._check_ball_bounce()
-                self.ball.update_position()
+                self._update_balls()
                 self._check_ball_touched_bottom()
+                self.game_stats.update_score()
+                self.scoreboard.prep_score()
             self._update_screen()
 
+    def _update_balls(self):
+        self.balls.update()
+
     def _check_ball_touched_bottom(self):
-        if self.ball.rect.bottom >= self.screen.get_rect().bottom:
-            self.game_stats.decrement_lives()
-            self.ball.rect.center = self.screen.get_rect().center
+        for ball in self.balls.sprites():
+            if ball.rect.bottom >= self.screen.get_rect().bottom:
+                self.game_stats.decrement_lives()
+                ball.rect.center = self.screen.get_rect().center
 
     def _check_ball_bounce(self):
         """ Check whether the ball is bouncing off the board. """
-        if self.board.rect.colliderect(self.ball.rect):
-            self.ball.increment_y = False
+        for ball in self.balls.sprites():
+            if self.board.rect.colliderect(ball.rect):
+                ball.increment_y = False
 
     def _check_events(self):
         for event in pygame.event.get():
@@ -70,8 +83,13 @@ class BouncingBall:
 
     def _update_screen(self):
         self.screen.fill(self.settings.bg_color)
+        self.scoreboard.show_score()
         self.board.blitme()
-        self.ball.blitme()
+
+        if len(self.balls) < self.settings.no_of_balls:
+            self.balls.add(Ball(random.choice(self.ball_choices), self))
+        for ball in self.balls.sprites():
+            ball.blitme()
         pygame.display.flip()
 
 

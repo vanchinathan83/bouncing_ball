@@ -1,23 +1,28 @@
 import pygame
 import random
+from pygame.sprite import Sprite
 
-class Ball:
+class Ball(Sprite):
     """ This is the class that controls the ball. """
 
-    def __init__(self, bb_game):
+    def __init__(self, image_path, bb_game):
+        super().__init__()
         self.screen = bb_game.screen
         self.settings = bb_game.settings
         self.screen_rect = bb_game.screen.get_rect()
+        self.image_path = image_path
 
-        self.image = pygame.image.load('images/ball.png')
+        self.image = pygame.image.load(self.image_path)
         self.rect = self.image.get_rect()
 
-        self.rect.center = self.screen_rect.center
+        self.rect.x = random.randint(10, self.screen_rect.width)
+        self.rect.y = float(self.screen_rect.height / 2 - random.randint(0,200))
         self.game_stats = bb_game.game_stats
-        self.increment_x = True
-        self.increment_y = True
+        self.choices = [True, False]
+        self.increment_x = random.choice(self.choices)
+        self.increment_y = random.choice(self.choices)
 
-    def update_position(self):
+    def update(self):
         """ This method makes the ball move in a diagonal fashion. """
         self._update_movement()
 
