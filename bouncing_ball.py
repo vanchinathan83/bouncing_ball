@@ -32,7 +32,13 @@ class BouncingBall:
                 self.board.update_position()
                 self._check_ball_bounce()
                 self.ball.update_position()
+                self._check_ball_touched_bottom()
             self._update_screen()
+
+    def _check_ball_touched_bottom(self):
+        if self.ball.rect.bottom >= self.screen.get_rect().bottom:
+            self.game_stats.decrement_lives()
+            self.ball.rect.center = self.screen.get_rect().center
 
     def _check_ball_bounce(self):
         """ Check whether the ball is bouncing off the board. """

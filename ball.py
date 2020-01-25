@@ -23,20 +23,26 @@ class Ball:
 
         if self.increment_x:
             self.rect.x += self.settings.ball_speed
+            # make sure that the next movement 
+            # does not cross the screen
+            if self.rect.right >= self.screen_rect.right:
+                self.rect.right = self.screen_rect.right
+                self.increment_x = False
         else:
             self.rect.x -= self.settings.ball_speed
+            if self.rect.left <= self.screen_rect.left:
+                self.rect.left = self.screen_rect.left
+                self.increment_x = True
 
         if self.increment_y:
             self.rect.y += self.settings.ball_speed
         else:
             self.rect.y -= self.settings.ball_speed
+            if self.rect.top < 0:
+                self.rect.top = 0
+                self.increment_y = True
 
     def _update_movement(self):
-        if self.rect.bottom >= self.screen_rect.bottom:
-            # Ball touched the bottom of the rectangle
-            # Decrement lives and center the ball
-            self.game_stats.decrement_lives()
-            self.rect.center = self.screen_rect.center
         if self.rect.top <= self.screen_rect.top:
             self.increment_y = True
         if self.rect.right >= self.screen_rect.right:
@@ -45,5 +51,5 @@ class Ball:
             self.increment_x = True
 
     def blitme(self):
-        """ Draw the board. """
+        """ Draw the ball. """
         self.screen.blit(self.image, self.rect)
